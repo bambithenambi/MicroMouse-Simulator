@@ -21,5 +21,5 @@ void microMouseServer::studentAI()
  * void foundFinish();
  * void printUI(const char *mesg);
 */
-
+    moveForward();
 }
