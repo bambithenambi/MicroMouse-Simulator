@@ -22,24 +22,46 @@ void microMouseServer::studentAI()
  * void printUI(const char *mesg);
 */
     //to check if maze is solved, the mouse must turn right and move forward three times consecutively
+    //after three moves and turns, the mouse should have an empty grid spot in front of it, the spot it started on
     static int rightRotation=0; //will retain value each time function is called
-
+    static bool didMoveForward=false;//indicates if the mouse's last action was moving forward
+    static bool hasNotTurned=false;//indicates whether mouse is moving in a 2x2 square or some other space
 
     if (!isWallForward()&&isWallLeft()) {
+        if (didMoveForward) {
+            hasNotTurned=true;
+        }
         moveForward();
+        didMoveForward=true;
     }
     else if (isWallLeft()) {
         turnRight();
-        rightRotation++;
+        if (rightRotation==0) {
+            if (didMoveForward) {
+                rightRotation++;
+            }
+        }
+        else {
+            if (didMoveForward && !hasNotTurned) {
+                rightRotation++;
+            }
+        }
+        didMoveForward=false;
+        hasNotTurned=false;
     }
     else {
         turnLeft();
         moveForward();
         rightRotation=0;
+        didMoveForward=true;
     }
 
     if (rightRotation==3) {
-        foundFinish();
+        if (!isWallForward()) {
+            foundFinish();
+        }
+        rightRotation=0;
     }
+
 
 }
