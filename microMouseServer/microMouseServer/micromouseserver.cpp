@@ -36,12 +36,13 @@ microMouseServer::~microMouseServer()
     delete maze;
 }
 
-
+/*
 void microMouseServer::on_tabWidget_tabBarClicked(int index)
 {
     index = index;
     //left for testing, does nothing in this rev, will remove in nex rev
 }
+*/
 
 void microMouseServer::connectSignals()
 {
@@ -211,7 +212,7 @@ void microMouseServer::saveMaze()
                 int left = this->mazeData[i][j].isWallLeft();
                 int right = this->mazeData[i][j].isWallRight();
 
-                mazeFile << this->mazeData[i][j].posX() << " " << this->mazeData[i][j].posY() << " " << top << " " << bottom << " " << left << " " << right << endl;
+                mazeFile << this->mazeData[i][j].posX() << " " << this->mazeData[i][j].posY() << " " << top << " " << bottom << " " << left << " " << right << Qt::endl;
             }
         }
 
