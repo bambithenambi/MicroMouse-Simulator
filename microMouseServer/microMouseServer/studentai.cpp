@@ -21,14 +21,25 @@ void microMouseServer::studentAI()
  * void foundFinish();
  * void printUI(const char *mesg);
 */
+    //to check if maze is solved, the mouse must turn right and move forward three times consecutively
+    static int rightRotation=0; //will retain value each time function is called
+
+
     if (!isWallForward()&&isWallLeft()) {
         moveForward();
     }
     else if (isWallLeft()) {
         turnRight();
+        rightRotation++;
     }
     else {
         turnLeft();
         moveForward();
+        rightRotation=0;
     }
+
+    if (rightRotation==3) {
+        foundFinish();
+    }
+
 }
