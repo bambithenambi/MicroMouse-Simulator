@@ -28,6 +28,7 @@ void microMouseServer::studentAI()
     static bool didMoveForward=false;//indicates if the mouse's last action was moving forward
     static bool hasNotTurned=false;//indicates whether mouse is moving in a 2x2 square or some other space
     */
+    /*
     static int moves[3] = { -1, -1, -1}; //initialize moves array
     static int current_move;
     static int move_selector=0; //count moves executed
@@ -65,4 +66,34 @@ void microMouseServer::studentAI()
         foundFinish();
     }
     move_selector++;
+    */
+    static int state = 0;
+    if(!isWallLeft()){
+        if(isWallRight() && !isWallForward() && state==0) //right entry, first cell
+            state = 1;
+        if(!isWallRight() || isWallForward()) //impossible states for solution, reset
+            state = 0;
+        turnLeft();
+        moveForward();
+    }
+    else if(!isWallForward()){
+        if(state == 0 && !isWallRight()) //Left entry, first cell
+            state = 2;
+        if(isWallRight()){ //impossible state for solution, reset.
+            state = 0;
+        }
+        moveForward();
+    }
+    else if(!isWallRight()){
+        if(state >0)
+            state += 2;
+        turnRight();
+        moveForward();
+    }
+    else{  //dead end, turn around by turning left once so next cycle you go left
+        state = 0;
+        turnLeft();
+    }
+    if(state >= 6)
+        foundFinish();
 }
