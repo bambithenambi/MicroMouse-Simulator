@@ -1,6 +1,17 @@
 
 #include "micromouseserver.h"
+void updateCoord(int &x, int &y, int &dir) {
+    dir = dir%4;
+    if (dir==0)
+        y++;
+    else if (dir==1)
+        x++;
+    else if (dir==2)
+        y--;
+    else if (dir==3)
+        x--;
 
+}
 void microMouseServer::studentAI()
 {
 /*
@@ -67,6 +78,10 @@ void microMouseServer::studentAI()
     }
     move_selector++;
     */
+    static int history[20][20];
+    static int x=0, y=0, dir=0;
+    memset(history, 0, sizeof(history));
+
     static int state = 0;
     if(!isWallLeft()){
         if(isWallRight() && !isWallForward() && state==0) //right entry, first cell
@@ -74,7 +89,9 @@ void microMouseServer::studentAI()
         if(!isWallRight() || isWallForward()) //impossible states for solution, reset
             state = 0;
         turnLeft();
+        dir--;
         moveForward();
+        updateCoord(x, y, dir);
     }
     else if(!isWallForward()){
         if(state == 0 && !isWallRight()) //Left entry, first cell
@@ -83,17 +100,22 @@ void microMouseServer::studentAI()
             state = 0;
         }
         moveForward();
+        updateCoord(x, y, dir);
     }
     else if(!isWallRight()){
         if(state >0)
             state += 2;
         turnRight();
+        dir++;
         moveForward();
+        updateCoord(x, y, dir);
     }
     else{  //dead end, turn around by turning left once so next cycle you go left
         state = 0;
         turnLeft();
+        dir--;
     }
     if(state >= 6)
         foundFinish();
 }
+
