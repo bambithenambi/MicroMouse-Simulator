@@ -1,6 +1,6 @@
-
+#include <string>
 #include "micromouseserver.h"
-void updateCoord(int &x, int &y, int &dir) {
+void updateCoord(int &x, int &y, int &dir, int a[][20]) {
     dir = dir%4;
     if (dir==0)
         y++;
@@ -10,6 +10,7 @@ void updateCoord(int &x, int &y, int &dir) {
         y--;
     else if (dir==3)
         x--;
+    a[x][y] = a[x][y]+1;
 
 }
 void microMouseServer::studentAI()
@@ -81,6 +82,7 @@ void microMouseServer::studentAI()
     static int history[20][20];
     static int x=0, y=0, dir=0;
     memset(history, 0, sizeof(history));
+    history[0][0] = 1;
 
     static int state = 0;
     if(!isWallLeft()){
@@ -91,7 +93,7 @@ void microMouseServer::studentAI()
         turnLeft();
         dir--;
         moveForward();
-        updateCoord(x, y, dir);
+        updateCoord(x, y, dir, history);
     }
     else if(!isWallForward()){
         if(state == 0 && !isWallRight()) //Left entry, first cell
@@ -100,7 +102,7 @@ void microMouseServer::studentAI()
             state = 0;
         }
         moveForward();
-        updateCoord(x, y, dir);
+        updateCoord(x, y, dir, history);
     }
     else if(!isWallRight()){
         if(state >0)
@@ -108,7 +110,7 @@ void microMouseServer::studentAI()
         turnRight();
         dir++;
         moveForward();
-        updateCoord(x, y, dir);
+        updateCoord(x, y, dir, history);
     }
     else{  //dead end, turn around by turning left once so next cycle you go left
         state = 0;
