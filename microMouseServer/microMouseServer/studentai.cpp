@@ -123,7 +123,7 @@ void microMouseServer::studentAI()
     static int history[20][20];
     static int x=0, y=0, dir=0;
     memset(history, 0, sizeof(history));
-    history[0][0] = 1;
+    history[0][0] = 0;
 
     static int state = 0;
     if(!isWallLeft() &&
