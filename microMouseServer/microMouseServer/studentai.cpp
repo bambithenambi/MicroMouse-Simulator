@@ -25,6 +25,7 @@ int timesLeft(int x, int y, int dir, int a[20][20]) {
             return a[x][y-1];
         case 3:
             return a[x-1][y];
+        default: return 10000;
     }
 }
 int timesForward(int x, int y, int dir, int a[20][20]) {
@@ -37,6 +38,7 @@ int timesForward(int x, int y, int dir, int a[20][20]) {
             return a[x][y-1];
         case 3:
             return a[x-1][y];
+        default: return 10000;
     }
 }
 int timesRight(int x, int y, int dir, int a[20][20]) {
@@ -51,6 +53,7 @@ int timesRight(int x, int y, int dir, int a[20][20]) {
             return a[x][y-1];
         case 3:
             return a[x-1][y];
+        default: return 10000;
     }
 }
 
@@ -122,45 +125,52 @@ void microMouseServer::studentAI()
     */
     static int history[20][20];
     static int x=0, y=0, dir=0;
+    static int moves[3] = { -1, -1, -1}; //initialize moves array
+    static int current_move;
+    static int move_selector=0; //count moves executed
     memset(history, 0, sizeof(history));
-    history[0][0] = 0;
 
-    static int state = 0;
     if(!isWallLeft() &&
+       !isWallForward() &&
        (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
+       !isWallRight() &&
        (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history))){
-        if(isWallRight() && !isWallForward() && state==0) //right entry, first cell
-            state = 1;
-        if(!isWallRight() || isWallForward()) //impossible states for solution, reset
-            state = 0;
+        current_move = 3;
         turnLeft();
         dir--;
         moveForward();
         updateCoord(x, y, dir, history);
     }
     else if(!isWallForward()){
-        if(state == 0 && !isWallRight()) //Left entry, first cell
-            state = 2;
-        if(isWallRight()){ //impossible state for solution, reset.
-            state = 0;
-        }
+        current_move = 0;
         moveForward();
         updateCoord(x, y, dir, history);
     }
     else if(!isWallRight()){
-        if(state >0)
-            state += 2;
+        current_move = 2;
         turnRight();
         dir++;
         moveForward();
         updateCoord(x, y, dir, history);
     }
     else{  //dead end, turn around by turning left once so next cycle you go left
-        state = 0;
+        current_move = 1;
         turnLeft();
         dir--;
+        updateCoord(x, y, dir, history);
     }
-    if(state >= 6)
+    int i = move_selector%3;
+    if (move_selector<3) { //initialize position array
+        moves[i] = current_move;
+    }
+    else {
+        moves[0]=moves[1]; //drop oldest position
+        moves[1]=moves[2]; //shift other two positions 1 index to the left
+        moves[2]=current_move; //append new position to the rightmost index
+    }
+    if ((moves[0]==2)&&(moves[1]==2)&&(moves[2]==2)) { //check if last three moves were (turnRight+moveForward)
         foundFinish();
+    }
+    move_selector++;
 }
 
