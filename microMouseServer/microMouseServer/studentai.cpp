@@ -1,5 +1,7 @@
 #include <string>
 #include "micromouseserver.h"
+#include <iostream>
+using namespace std;
 void updateCoord(int &x, int &y, int &dir, int a[20][20]) {
     dir = dir%4;
     if (dir==0)
@@ -124,24 +126,32 @@ void microMouseServer::studentAI()
     move_selector++;
     */
     static int history[20][20];
+    static bool init = true;
     static int x=0, y=0, dir=0;
     static int moves[3] = { -1, -1, -1}; //initialize moves array
     static int current_move;
     static int move_selector=0; //count moves executed
-    memset(history, 0, sizeof(history));
+    if(init) {
+        memset(history, 0, sizeof(history));
+        init = false;
+        cout << "initialized" << endl;
+    }
 
     if(!isWallLeft() &&
        (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
+       (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history)) &&
        !isWallForward() &&
-       !isWallRight() &&
-       (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history))){
+       !isWallRight()){
         current_move = 3;
         turnLeft();
         dir--;
         moveForward();
         updateCoord(x, y, dir, history);
     }
-    else if(!isWallForward()){
+    else if(!isWallForward() &&
+            timesForward(x, y, dir, history)<=timesRight(x, y, dir, history)){
+        cout << timesForward(x, y, dir, history) << " " << timesRight(x, y, dir, history) << endl;
+        cout << !isWallRight() << endl;
         current_move = 0;
         moveForward();
         updateCoord(x, y, dir, history);
