@@ -131,8 +131,8 @@ void microMouseServer::studentAI()
     memset(history, 0, sizeof(history));
 
     if(!isWallLeft() &&
-       !isWallForward() &&
        (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
+       !isWallForward() &&
        !isWallRight() &&
        (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history))){
         current_move = 3;
