@@ -1,6 +1,6 @@
 #include <string>
 #include "micromouseserver.h"
-void updateCoord(int &x, int &y, int &dir, int a[][20]) {
+void updateCoord(int &x, int &y, int &dir, int a[20][20]) {
     dir = dir%4;
     if (dir==0)
         y++;
@@ -13,6 +13,47 @@ void updateCoord(int &x, int &y, int &dir, int a[][20]) {
     a[x][y] = a[x][y]+1;
 
 }
+int timesLeft(int x, int y, int dir, int a[20][20]) {
+    dir--;
+    dir = dir%4;
+    switch(dir) {
+        case 0:
+            return a[x][y+1];
+        case 1:
+            return a[x+1][y];
+        case 2:
+            return a[x][y-1];
+        case 3:
+            return a[x-1][y];
+    }
+}
+int timesForward(int x, int y, int dir, int a[20][20]) {
+    switch(dir) {
+        case 0:
+            return a[x][y+1];
+        case 1:
+            return a[x+1][y];
+        case 2:
+            return a[x][y-1];
+        case 3:
+            return a[x-1][y];
+    }
+}
+int timesRight(int x, int y, int dir, int a[20][20]) {
+    dir++;
+    dir = dir%4;
+    switch(dir) {
+        case 0:
+            return a[x][y+1];
+        case 1:
+            return a[x+1][y];
+        case 2:
+            return a[x][y-1];
+        case 3:
+            return a[x-1][y];
+    }
+}
+
 void microMouseServer::studentAI()
 {
 /*
@@ -85,7 +126,9 @@ void microMouseServer::studentAI()
     history[0][0] = 1;
 
     static int state = 0;
-    if(!isWallLeft()){
+    if(!isWallLeft() &&
+       (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
+       (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history))){
         if(isWallRight() && !isWallForward() && state==0) //right entry, first cell
             state = 1;
         if(!isWallRight() || isWallForward()) //impossible states for solution, reset
