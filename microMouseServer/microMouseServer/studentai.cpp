@@ -2,7 +2,8 @@
 #include "micromouseserver.h"
 #include <iostream>
 using namespace std;
-void updateCoord(int &x, int &y, int &dir, int a[20][20]) {
+void updateCoord(int &x, int &y, int &dir) {
+    dir+=4;
     dir = dir%4;
     if (dir==0)
         y++;
@@ -12,11 +13,12 @@ void updateCoord(int &x, int &y, int &dir, int a[20][20]) {
         y--;
     else if (dir==3)
         x--;
-    a[x][y] = a[x][y]+1;
+    //a[x][y] = a[x][y]+1;
 
 }
 int timesLeft(int x, int y, int dir, int a[20][20]) {
     dir--;
+    dir+=4;
     dir = dir%4;
     switch(dir) {
         case 0:
@@ -31,20 +33,7 @@ int timesLeft(int x, int y, int dir, int a[20][20]) {
     }
 }
 int timesForward(int x, int y, int dir, int a[20][20]) {
-    switch(dir) {
-        case 0:
-            return a[x][y+1];
-        case 1:
-            return a[x+1][y];
-        case 2:
-            return a[x][y-1];
-        case 3:
-            return a[x-1][y];
-        default: return 10000;
-    }
-}
-int timesRight(int x, int y, int dir, int a[20][20]) {
-    dir++;
+    dir+=4;
     dir = dir%4;
     switch(dir) {
         case 0:
@@ -55,7 +44,27 @@ int timesRight(int x, int y, int dir, int a[20][20]) {
             return a[x][y-1];
         case 3:
             return a[x-1][y];
-        default: return 10000;
+        default:
+            cout << "wtf" << endl;
+            return 10000;
+    }
+}
+int timesRight(int x, int y, int dir, int a[20][20]) {
+    dir++;
+    dir+=4;
+    dir = dir%4;
+    switch(dir) {
+        case 0:
+            return a[x][y+1];
+        case 1:
+            return a[x+1][y];
+        case 2:
+            return a[x][y-1];
+        case 3:
+            return a[x-1][y];
+        default:
+            cout << "wtf" << endl;
+            return 10000;
     }
 }
 
@@ -136,38 +145,39 @@ void microMouseServer::studentAI()
         init = false;
         cout << "initialized" << endl;
     }
-
+    cout << "x is " << x << "  y is " << y << "  dir is " << dir << endl;
     if(!isWallLeft() &&
        (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
        (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history)) &&
-       !isWallForward() &&
-       !isWallRight()){
+       !isWallForward()) {
         current_move = 3;
         turnLeft();
         dir--;
         moveForward();
-        updateCoord(x, y, dir, history);
+        updateCoord(x, y, dir);
+        history[x][y]++;
     }
     else if(!isWallForward() &&
             timesForward(x, y, dir, history)<=timesRight(x, y, dir, history)){
-        cout << timesForward(x, y, dir, history) << " " << timesRight(x, y, dir, history) << endl;
-        cout << !isWallRight() << endl;
+        //cout << timesForward(x, y, dir, history) << " " << timesRight(x, y, dir, history) << endl;
         current_move = 0;
         moveForward();
-        updateCoord(x, y, dir, history);
+        updateCoord(x, y, dir);
+        history[x][y]++;
     }
     else if(!isWallRight()){
         current_move = 2;
         turnRight();
         dir++;
         moveForward();
-        updateCoord(x, y, dir, history);
+        updateCoord(x, y, dir);
+        history[x][y]++;
     }
     else{  //dead end, turn around by turning left once so next cycle you go left
         current_move = 1;
         turnLeft();
         dir--;
-        updateCoord(x, y, dir, history);
+        history[x][y]++;
     }
     int i = move_selector%3;
     if (move_selector<3) { //initialize position array
@@ -178,9 +188,10 @@ void microMouseServer::studentAI()
         moves[1]=moves[2]; //shift other two positions 1 index to the left
         moves[2]=current_move; //append new position to the rightmost index
     }
-    if ((moves[0]==2)&&(moves[1]==2)&&(moves[2]==2)) { //check if last three moves were (turnRight+moveForward)
+    if ((moves[0]==2)&&(moves[1]==2)&&(moves[2]==2)&&!isWallRight()) { //check if last three moves were (turnRight+moveForward)
         foundFinish();
     }
     move_selector++;
+
 }
 
