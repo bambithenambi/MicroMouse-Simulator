@@ -145,40 +145,55 @@ void microMouseServer::studentAI()
         init = false;
         cout << "initialized" << endl;
     }
-    cout << "x is " << x << "  y is " << y << "  dir is " << dir << endl;
+    cout << "x is " << x << "  y is " << y << "  dir is " << dir << "LEFTWALL " << !isWallLeft() << endl;
+
     if(!isWallLeft() &&
-       (timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
-       (timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history)) &&
-       !isWallForward()) {
+       (isWallForward() || timesLeft(x, y, dir, history)<=timesForward(x, y, dir, history)) &&
+       (isWallRight() || timesLeft(x, y, dir, history)<=timesRight(x, y, dir, history))) {
         current_move = 3;
         turnLeft();
         dir--;
-        moveForward();
         updateCoord(x, y, dir);
         history[x][y]++;
+        cout << "turned left and moved forward" << endl;
     }
     else if(!isWallForward() &&
-            timesForward(x, y, dir, history)<=timesRight(x, y, dir, history)){
+            (isWallRight() || timesForward(x, y, dir, history)<=timesRight(x, y, dir, history))){
         //cout << timesForward(x, y, dir, history) << " " << timesRight(x, y, dir, history) << endl;
         current_move = 0;
-        moveForward();
         updateCoord(x, y, dir);
         history[x][y]++;
+        cout << "move forward" << endl;
     }
+    /*
+    else if(!isWallForward() &&
+            isWallLeft() &&
+            isWallRight()) {
+        current_move = 0;
+        updateCoord(x, y, dir);
+        history[x][y]++;
+        cout << "move forward in pipe" << endl;
+    }
+    */
     else if(!isWallRight()){
         current_move = 2;
         turnRight();
         dir++;
-        moveForward();
         updateCoord(x, y, dir);
         history[x][y]++;
+        cout << "turned right" << endl;
     }
     else{  //dead end, turn around by turning left once so next cycle you go left
         current_move = 1;
         turnLeft();
-        dir--;
+        turnLeft();
+        dir-=2;
+        updateCoord(x, y, dir);
         history[x][y]++;
+        cout << "turn left dead end  " << timesForward(x, y, dir, history) << "  " << timesRight(x, y, dir, history) << endl;
     }
+    if(!moveForward())
+            exit(100);
     int i = move_selector%3;
     if (move_selector<3) { //initialize position array
         moves[i] = current_move;
